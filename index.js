@@ -185,6 +185,7 @@ app.get('/', async (req, res) => {
                 class="product-image"
                 src="https://raw.githubusercontent.com/i13mogi/013image/refs/heads/main/${code}.jpg"
                 alt="${code}"
+                loading="lazy"
                 data-code="${code}"
                 data-intro="${intro}"
               >
@@ -214,6 +215,7 @@ app.get('/', async (req, res) => {
             class="product-image"
             src="https://raw.githubusercontent.com/i13mogi/013image/refs/heads/main/${code}.jpg"
             alt="${code}"
+            loading="lazy"
             data-code="${code}"
             data-intro="${intro}"
             ${attr}
@@ -782,7 +784,6 @@ header nav a:hover {
     <button class="close-btn" onclick="closeCategoryModal()">關閉</button>
   </div>
 </div>
-
 <!-- 類別詳細 Modal -->
 <div id="categoryDetailModal" class="modal-overlay">
   <div class="modal-content">
@@ -791,8 +792,6 @@ header nav a:hover {
     <div id="categoryDetailIntro" style="margin-top:1rem; font-size:1rem; line-height:1.4;"></div>
   </div>
 </div>
-
-
   <!-- 其他 Modal（空背籃、商品詳細、修改商品數量、庫存不足提醒、Toast） -->
   <div id="emptyCartModal" class="modal">
     <div class="modal-content">
