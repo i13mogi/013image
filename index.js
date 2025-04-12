@@ -42,7 +42,7 @@ app.use(bodyParser.json());
 const SPREADSHEET_ID   = process.env.SPREADSHEET_ID   || '1nDs6ZjIqOFU3FLVqRPheLjAiC-Xd23ykLBuffEm12R0'; // 試算表 ID
 const ORDERS_SHEET     = process.env.ORDERS_SHEET     || 'Orders';        // 訂單工作表名稱
 const INVENTORY_SHEET  = process.env.INVENTORY_SHEET  || 'Inventory';     // 庫存工作表名稱
-const DISCORD_WEBHOOK  = process.env.DISCORD_WEBHOOK_URL || 'https://discord.com/api/webhooks/...';  // Discord Webhook URL
+const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL || 'https://discord.com/api/webhooks/1355787715332804741/48qF2dutYE0d9dH02FukAy2aC4yLLVuqEf3qVJGpjtTBLfB-geYQKpUpeRwwlZiFMEtg';  // Discord Webhook URL
 
 
 /***********************************************
@@ -483,10 +483,26 @@ header nav a:hover {
   align-items: center;
 }
 .close-drawer {
-  background: transparent;
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  width: 36px;            /* 調整按鈕大小 */
+  height: 36px;
+  font-size: 30px !important;        /* 調整 X 字體大小 */
+  line-height: 10px;      /* 讓 X 在中間 */
+  text-align: center;
+  color: white;
+  background-color: #e74c3c;
   border: none;
-  font-size: 1.2rem;
+  border-radius: 50%;     /* 變成圓形 */
   cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s ease, background-color 0.3s ease;
+}
+
+.close-drawer:hover {
+  background-color: #c0392b;
+  transform: scale(1.1);  /* 滑過放大一點點 */
 }
 
 
@@ -506,6 +522,7 @@ header nav a:hover {
   align-items: center;
   z-index: 1000;
   opacity: 0;
+  overflow: auto; /* 如果有內容過長時，讓整個 modal 也可滾動 */
 }
 .modal.show {
   display: flex;
@@ -518,21 +535,56 @@ header nav a:hover {
   border-radius: 10px;
   max-width: 400px;
   width: 90%;
+  max-height: 75vh;              /* 固定高度，讓內容超出時一定產生滾動 */
+  overflow-y: scroll;        /* 強制顯示垂直滾軸 */
+  scrollbar-gutter: stable;  /* (支援瀏覽器保留滾軸空間) */
+  
+  /* Firefox 專用設定 */
+  scrollbar-width: auto;
+  scrollbar-color: #7e8a24 #eee;
   animation: fadeIn 0.3s ease;
-  max-height: 80vh;
-  overflow-y: auto;
 }
+
+/* Webkit 瀏覽器自訂滾軸 */
+.modal-content::-webkit-scrollbar {
+  width: 12px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+  background: #7e8a24;
+  border-radius: 6px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+  background: #eee;
+}
+
+
 @keyframes fadeIn {
   from { opacity: 0; transform: scale(0.9); }
   to { opacity: 1; transform: scale(1); }
 }
+
 .close-modal {
   position: absolute;
-  top: 0.5rem;
-  right: 0.75rem;
+  top: 10px;
+  right: 15px;
   font-size: 1.5rem;
-  color: var(--text-color);
+  width: 36px;
+  height: 36px;
+  text-align: center;
+  line-height: 36px;
   cursor: pointer;
+  color: white;
+  background-color: #e74c3c;  /* 背景紅色 */
+  border: none;
+  border-radius: 50%;         /* 圓形按鈕 */
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.close-modal:hover {
+  background-color: #c0392b;  /* 滑過變深紅 */
+  transform: scale(1.1);      /* 稍微放大 */
 }
 
 /* 全螢幕 Icon Grid Modal */
@@ -580,11 +632,20 @@ header nav a:hover {
   flex-direction: column;
   align-items: center;
 }
+/* 調整 icon 圖示大小 */
 .grid-item img {
-  width: 40px;
-  height: 40px;
-  object-fit: contain;
+  width: auto;    /* 設定合適的寬度，例如 60px */
+  height: 30px;   /* 同時調整高度，或設定 auto 依比例調整 */
+  object-fit: contain; /* 若圖示比例不同，可使用此設定 */
   margin-bottom: 0.5rem;
+}
+/* 調整 icon 文字大小 */
+.grid-item span {
+  font-size: 16px;
+  font-weight: 600;
+  margin-top: 8px;
+  display: block;
+  text-align: center;
 }
 .grid-item:hover,
 .grid-item:focus {
@@ -756,7 +817,7 @@ header nav a:hover {
   <div id="cartDrawer" class="cart-drawer">
     <div class="drawer-header">
       <h2>背籃</h2>
-      <button class="close-drawer" onclick="closeCartDrawer()">關閉</button>
+      <button class="close-drawer" onclick="closeCartDrawer()">&times;</button>
     </div>
     <div id="cartSummary" class="drawer-content">目前尚未選購任何商品。</div>
     <button class="btn-select" onclick="goToCheckout()">結帳</button>
@@ -777,8 +838,8 @@ header nav a:hover {
         </button>`
       ).join('')}
       <button class="grid-item" onclick="filterCategory('all')">
-        <img src="https://raw.githubusercontent.com/i13mogi/013image/refs/heads/main/icons/all.png" alt="全部">
-        <span>全部</span>
+        <img src="https://raw.githubusercontent.com/i13mogi/013image/refs/heads/main/icons/all.png" alt="全部內容">
+        <span>全部內容</span>
       </button>
     </div>
     <button class="close-btn" onclick="closeCategoryModal()">關閉</button>
@@ -786,8 +847,8 @@ header nav a:hover {
 </div>
 <!-- 類別詳細 Modal -->
 <div id="categoryDetailModal" class="modal-overlay">
+<span class="close-modal" onclick="closeCategoryDetailModal()">&times;</span>
   <div class="modal-content">
-    <span class="close-modal" onclick="closeCategoryDetailModal()">&times;</span>
     <img id="categoryDetailImage" src="" alt="大圖" style="width:100%; height:auto;">
     <div id="categoryDetailIntro" style="margin-top:1rem; font-size:1rem; line-height:1.4;"></div>
   </div>
@@ -802,8 +863,8 @@ header nav a:hover {
     </div>
   </div>
   <div id="productModal" class="modal">
+  <span class="close-modal" onclick="closeModal('productModal')">&times;</span>
     <div class="modal-content">
-      <span class="close-modal" onclick="closeModal('productModal')">&times;</span>
       <img id="modalImage" src="" alt="大圖" style="width:100%; height:auto;">
       <div id="modalDetails" style="margin-top: 1rem;">
         <h2 id="modalTitle"></h2>
@@ -852,7 +913,7 @@ header nav a:hover {
   // 購物車物件、目前被選的產品、頁面顯示資訊等
   var cart = {};
   var currentProductIndex = 0;
-  var pageSize = 13;
+  var pageSize = 5;
   var currentQuantityProduct = null;
   var currentModalProduct = null;
 
@@ -1310,7 +1371,7 @@ header nav a:hover {
         const keys = Object.keys(cart);
         document.getElementById('cartCount').textContent = keys.length;
         document.getElementById('openCartButton').style.backgroundColor =
-          keys.length > 0 ? '#ff0000' : 'var(--primary-color)';
+          keys.length > 0 ? '#bd1111' : 'var(--primary-color)';
         localStorage.setItem("cart", JSON.stringify(cart));
         if (keys.length === 0) {
           cartDiv.innerHTML = '你的背籃空空也，趕緊填滿它吧!';
