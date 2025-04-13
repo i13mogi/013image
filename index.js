@@ -887,7 +887,7 @@ header nav a:hover {
   <span class="close-modal" onclick="closeModal('productModal')">&times;</span>
     <div class="modal-content">
     <!-- 放入一個滾動提示元素 -->
-      <div id="scrollHint" class="scroll-hint">請向下滾動查看更多</div>
+      <div id="scrollHint" class="scroll-hint">請滑動查看更多</div>
       <img id="modalImage" src="" alt="大圖" style="width:100%; height:auto;">
       <div id="modalDetails" style="margin-top: 1rem;">
         <h2 id="modalTitle"></h2>
