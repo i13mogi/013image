@@ -592,7 +592,7 @@ header nav a:hover {
   max-height: 60vh;        /* 視需要調整 */
   overflow-y: auto;        /* 產生捲動 */
 }
-  
+
 /* 捲動提示 */
 .scroll-hint {
   position: absolute;
@@ -1272,42 +1272,7 @@ header nav a:hover {
     }
   }
 
-   /*******************************************
-   * 在這裡加入「滑動提示」的初始化與監聽
-   *******************************************/
-  (function() {
-    const modalDetails = document.getElementById('modalDetails');
-    const scrollHint   = document.getElementById('scrollHint');
-    const productModal = document.getElementById('productModal');
 
-    // 每次打開商品 Modal 時檢查是否需要顯示提示
-    const origOpen = openProductModal;
-    openProductModal = function(code, intro, price, stock, imageUrl) {
-      origOpen(code, intro, price, stock, imageUrl);
-      // 微延遲，等內容渲染完畢
-      setTimeout(() => {
-        if (modalDetails.scrollHeight > modalDetails.clientHeight) {
-          scrollHint.classList.add('show');
-        } else {
-          scrollHint.classList.remove('show');
-        }
-      }, 50);
-    };
-
-    // 監聽使用者在 Modal 內容的捲動
-    modalDetails.addEventListener('scroll', () => {
-      if (scrollHint.classList.contains('show')) {
-        scrollHint.classList.remove('show');
-      }
-    });
-
-    // 如果你有在點空白處關閉，也一併隱藏提示
-    window.addEventListener('click', (e) => {
-      if (e.target === productModal) {
-        scrollHint.classList.remove('show');
-      }
-    });
-  })();
 
   /*******************************************
    * 背籃與數量處理函式區
@@ -1637,6 +1602,41 @@ header nav a:hover {
   // 請確認 renderOrderSummary() 函式是否有定義，
   // 若無，請根據您實際需求自行實作更新訂單摘要的邏輯
 
+  /*******************************************
+   * 在這裡加入「滑動提示」的初始化與監聽
+   *******************************************/
+  (function() {
+    const modalDetails = document.getElementById('modalDetails');
+    const scrollHint   = document.getElementById('scrollHint');
+    const productModal = document.getElementById('productModal');
+
+    // 包裝 openProductModal：開啟後檢查高度，決定是否顯示提示
+    const origOpen = openProductModal;
+    openProductModal = function(code, intro, price, stock, imageUrl) {
+      origOpen(code, intro, price, stock, imageUrl);
+      setTimeout(() => {
+        if (modalDetails.scrollHeight > modalDetails.clientHeight) {
+          scrollHint.classList.add('show');
+        } else {
+          scrollHint.classList.remove('show');
+        }
+      }, 50);
+    };
+
+    // 使用者一捲就移除提示
+    modalDetails.addEventListener('scroll', () => {
+      scrollHint.classList.remove('show');
+    });
+
+    // 點背景關閉時，也移除提示
+    window.addEventListener('click', (e) => {
+      if (e.target === productModal) {
+        scrollHint.classList.remove('show');
+      }
+    });
+  })();
+
+
 </script>
 
 </body>
@@ -1957,6 +1957,8 @@ function renderOrderSummary() {
         return false;
       }
     });
+    
+
     
   </script>
 </body>
