@@ -20,6 +20,32 @@ const session = require('express-session');     // 用於 session 管理
  ***********************************************/
 const app = express();
 
+/**
+ * 預熱初始化工作
+ * 可在此處執行輕量級作業，例如預先讀取 Google Sheets 的部分資料
+ */
+async function warmUp() {
+  try {
+    // 嘗試讀取 Inventory 工作表的 A 欄（僅讀取標題列）
+    const result = await sheets.spreadsheets.values.get({
+      spreadsheetId: SPREADSHEET_ID,
+      range: `${INVENTORY_SHEET}!A:A`
+    });
+    console.log("Warmup: Inventory header fetched successfully.");
+  } catch (err) {
+    console.error("Warmup failed:", err);
+  }
+}
+
+// 設定預熱請求路由 (請將此路由放在其他路由設定之前)
+app.get('/_ah/warmup', async (req, res) => {
+  console.log('Warmup request received.');
+  // 執行預熱初始化作業（你可以根據需要調整要預先執行的工作內容）
+  await warmUp();
+  // 快速回應 200 狀態
+  res.status(200).send('Warmup completed.');
+});
+
 // 設定 express-session 中間件
 const SESSION_SECRET = process.env.SESSION_SECRET || 'a3f1d8e4c9bffb4a7d3e2c';
 app.use(session({
@@ -547,18 +573,17 @@ header nav a:hover {
 
 /* Webkit 瀏覽器自訂滾軸 */
 .modal-content::-webkit-scrollbar {
-  width: 12px;
+  width: 14px;
 }
 
 .modal-content::-webkit-scrollbar-thumb {
   background: #7e8a24;
-  border-radius: 6px;
+  border-radius: 7px;
 }
 
 .modal-content::-webkit-scrollbar-track {
   background: #eee;
 }
-
 
 @keyframes fadeIn {
   from { opacity: 0; transform: scale(0.9); }
