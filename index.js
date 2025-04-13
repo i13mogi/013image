@@ -537,81 +537,50 @@ header nav a:hover {
    包含各式 Modal (數量輸入、庫存提醒、全螢幕 Icon Grid Modal)
    ============================================================ */
 .modal {
-  display: none;
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background-color: rgba(0, 0, 0, 0.6);
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-  opacity: 0;
-  overflow: auto; /* 如果有內容過長時，讓整個 modal 也可滾動 */
-  transition: opacity 0.3s ease;
-}
-.modal.show {
-  display: flex;
-  opacity: 1;
-}
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: rgba(0, 0, 0, 0.6);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .modal.show {
+      display: flex;
+      opacity: 1;
+    }
 
 /* Modal 內容 */
 .modal-content {
-  position: relative;
-  background-color: var(--light-bg);
-  padding: 1.5rem;
-  border-radius: 10px;
-  max-width: 400px;
-  width: 90%;
-  max-height: 75vh;         /* 固定高度，讓內容超出時產生滾動 */
-  overflow-y: auto;         /* 強制顯示垂直滾軸 */
-  scrollbar-gutter: stable; /* 保留滾軸空間 */
-
-  /* 動畫 */
-  animation: fadeInScale 0.3s ease;
-}
-
-/* 自訂滾軸：Webkit */
-.modal-content::-webkit-scrollbar {
-  width: 12px;
-}
-.modal-content::-webkit-scrollbar-thumb {
-  background: #7e8a24;
-  border-radius: 6px;
-}
-.modal-content::-webkit-scrollbar-track {
-  background: #eee;
-}
-
-/* 自訂滾軸：Firefox */
-.modal-content {
-  scrollbar-width: auto;
-  scrollbar-color: #7e8a24 #eee;
-}
-
-#modalDetails {
-  position: relative;      /* scroll-hint 絕對定位的參考容器 */
-  max-height: 60vh;        /* 視需要調整 */
-  overflow-y: auto;        /* 產生捲動 */
-}
-
-/* 捲動提示 */
-.scroll-hint {
-  position: absolute;
-  bottom: 1rem;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 0.4rem 0.8rem;
-  background: rgba(0, 0, 0, 0.6);
-  color: #fff;
-  border-radius: 0.25rem;
-  font-size: 0.85rem;
-  display: none;        /* 預設隱藏 */
-  pointer-events: none; /* 不攔截滑動或點擊 */
-  z-index: 10;          /* 浮在內容上方 */
-}
-.scroll-hint.show {
-  display: block;
-  animation: fadeIn 0.3s ease-out;
-}
+      position: relative;
+      background-color: #fff;
+      padding: 1.5rem;
+      border-radius: 10px;
+      max-width: 400px;
+      width: 90%;
+      max-height: 75vh;
+      overflow-y: auto;
+    }
+    /* 滾動提示的樣式 */
+    .scroll-hint {
+      position: absolute;
+      bottom: 1rem;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 0.4rem 0.8rem;
+      background: rgba(0, 0, 0, 0.6);
+      color: #fff;
+      border-radius: 5px;
+      font-size: 0.9rem;
+      transition: opacity 0.3s ease;
+      opacity: 1;
+      pointer-events: none;
+    }
+    .scroll-hint.hidden {
+      opacity: 0;
+    }
 
 /* 動畫定義 */
 @keyframes fadeIn {
@@ -917,14 +886,14 @@ header nav a:hover {
   <div id="productModal" class="modal">
   <span class="close-modal" onclick="closeModal('productModal')">&times;</span>
     <div class="modal-content">
+    <!-- 放入一個滾動提示元素 -->
+      <div id="scrollHint" class="scroll-hint">請向下滾動查看更多</div>
       <img id="modalImage" src="" alt="大圖" style="width:100%; height:auto;">
       <div id="modalDetails" style="margin-top: 1rem;">
         <h2 id="modalTitle"></h2>
         <p id="modalDescription"></p>
         <p id="modalPrice"></p>
         <button id="modalSelectButton" class="btn-select" onclick="modalSelectProduct()">加入背籃</button>
-        <!-- 提示元素 -->
-      <div id="scrollHint" class="scroll-hint">向下滑動查看更多 ↓</div>
       </div>
     </div>
   </div>
@@ -1236,26 +1205,27 @@ header nav a:hover {
   }
 
   // 開啟商品詳細資訊 Modal（大圖與詳細描述）
-  function openProductModal(code, intro, price, stock, imageUrl) {
-    const stockNum = isNaN(stock) ? -1 : stock;
-    document.getElementById('modalImage').src = imageUrl;
-    document.getElementById('modalTitle').textContent = code;
-    document.getElementById('modalDescription').textContent = intro;
-    
-    if (stockNum === -1) {
-      document.getElementById('modalPrice').textContent = '';
-      document.getElementById('modalSelectButton').style.display = 'none';
-    } else if (stockNum === 0) {
-      document.getElementById('modalPrice').textContent = '懿昇價: ' + price + ' / 數量: ' + stockNum;
-      document.getElementById('modalSelectButton').style.display = 'none';
-    } else {
-      document.getElementById('modalPrice').textContent = '懿昇價: ' + price + ' / 數量: ' + stockNum;
-      document.getElementById('modalSelectButton').style.display = 'inline-block';
-      document.getElementById('modalSelectButton').textContent = '加入背籃';
-      document.getElementById('modalSelectButton').disabled = false;
-    }
-    document.getElementById('productModal').classList.add('show');
+ function openProductModal(code, intro, price, stock, imageUrl) {
+  // 更新 modal 內容
+  document.getElementById('modalImage').src = imageUrl;
+  document.getElementById('modalTitle').textContent = code;
+  document.getElementById('modalDescription').textContent = intro;
+  
+  if (isNaN(stock) || stock === -1) {
+    document.getElementById('modalPrice').textContent = '';
+    document.getElementById('modalSelectButton').style.display = 'none';
+  } else if (stock === 0) {
+    document.getElementById('modalPrice').textContent = '懿昇價: ' + price + ' / 數量: ' + stock;
+    document.getElementById('modalSelectButton').style.display = 'none';
+  } else {
+    document.getElementById('modalPrice').textContent = '懿昇價: ' + price + ' / 數量: ' + stock;
+    document.getElementById('modalSelectButton').style.display = 'inline-block';
+    document.getElementById('modalSelectButton').textContent = '加入背籃';
+    document.getElementById('modalSelectButton').disabled = false;
   }
+  // 統一調用 window.showModal() 確保滾動提示初始化
+  window.showModal();
+}
 
   // 關閉指定 ID 的 Modal（並在必要時恢復初始狀態）
   function closeModal(modalId) {
@@ -1605,40 +1575,46 @@ header nav a:hover {
   /*******************************************
    * 在這裡加入「滑動提示」的初始化與監聽
    *******************************************/
-  (function() {
-    const modalDetails = document.getElementById('modalDetails');
-    const scrollHint   = document.getElementById('scrollHint');
-    const productModal = document.getElementById('productModal');
+   // 當 DOM 加載完畢後，初始化滾動提示
+// 初始化滾動提示部分（只針對 #productModal 內的內容）
+document.addEventListener("DOMContentLoaded", function() {
+  const productModal = document.getElementById('productModal');
+  const modalContent = productModal.querySelector('.modal-content');
+  const scrollHint = document.getElementById('scrollHint');
+  
+  if (!modalContent || !scrollHint) return;
+  
+  function checkScrollHint() {
+    if (modalContent.scrollHeight > modalContent.clientHeight) {
+      scrollHint.style.display = 'block';
+    } else {
+      scrollHint.style.display = 'none';
+    }
+  }
+  
+  // 當內容一開始可能不足以產生滾動時，等待 300 毫秒再檢查一次（依狀況調整）
+  setTimeout(checkScrollHint, 300);
+  
+  modalContent.addEventListener('scroll', function() {
+    scrollHint.classList.add('hidden');
+    setTimeout(() => {
+      scrollHint.style.display = 'none';
+    }, 300);
+  });
+  
+  window.showModal = function() {
+    productModal.classList.add('show');
+    // 更新提示狀態，每次顯示 Modal 時都重置
+    scrollHint.classList.remove('hidden');
+    scrollHint.style.display = 'block';
+    checkScrollHint();
+  };
 
-    // 包裝 openProductModal：開啟後檢查高度，決定是否顯示提示
-    const origOpen = openProductModal;
-    openProductModal = function(code, intro, price, stock, imageUrl) {
-      origOpen(code, intro, price, stock, imageUrl);
-      setTimeout(() => {
-        if (modalDetails.scrollHeight > modalDetails.clientHeight) {
-          scrollHint.classList.add('show');
-        } else {
-          scrollHint.classList.remove('show');
-        }
-      }, 50);
-    };
-
-    // 使用者一捲就移除提示
-    modalDetails.addEventListener('scroll', () => {
-      scrollHint.classList.remove('show');
-    });
-
-    // 點背景關閉時，也移除提示
-    window.addEventListener('click', (e) => {
-      if (e.target === productModal) {
-        scrollHint.classList.remove('show');
-      }
-    });
-  })();
-
-
+  window.hideModal = function() {
+    productModal.classList.remove('show');
+  };
+});
 </script>
-
 </body>
 </html>`;
     // 傳送生成的 HTML 給使用者
