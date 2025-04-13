@@ -532,28 +532,28 @@ header nav a:hover {
 }
 
 
-/* ============================================================
+/* ============================================================ 
    7. Modal 與彈窗
    包含各式 Modal (數量輸入、庫存提醒、全螢幕 Icon Grid Modal)
    ============================================================ */
 .modal {
   display: none;
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  top: 0; left: 0; right: 0; bottom: 0;
   background-color: rgba(0, 0, 0, 0.6);
   justify-content: center;
   align-items: center;
   z-index: 1000;
   opacity: 0;
   overflow: auto; /* 如果有內容過長時，讓整個 modal 也可滾動 */
+  transition: opacity 0.3s ease;
 }
 .modal.show {
   display: flex;
   opacity: 1;
 }
+
+/* Modal 內容 */
 .modal-content {
   position: relative;
   background-color: var(--light-bg);
@@ -561,64 +561,94 @@ header nav a:hover {
   border-radius: 10px;
   max-width: 400px;
   width: 90%;
-  max-height: 75vh;              /* 固定高度，讓內容超出時一定產生滾動 */
-  overflow-y: scroll;        /* 強制顯示垂直滾軸 */
-  scrollbar-gutter: stable;  /* (支援瀏覽器保留滾軸空間) */
-  
-  /* Firefox 專用設定 */
-  scrollbar-width: auto;
-  scrollbar-color: #7e8a24 #eee;
-  animation: fadeIn 0.3s ease;
+  max-height: 75vh;         /* 固定高度，讓內容超出時產生滾動 */
+  overflow-y: auto;         /* 強制顯示垂直滾軸 */
+  scrollbar-gutter: stable; /* 保留滾軸空間 */
+
+  /* 動畫 */
+  animation: fadeInScale 0.3s ease;
 }
 
-/* Webkit 瀏覽器自訂滾軸 */
+/* 自訂滾軸：Webkit */
 .modal-content::-webkit-scrollbar {
-  width: 14px;
+  width: 12px;
 }
-
 .modal-content::-webkit-scrollbar-thumb {
   background: #7e8a24;
-  border-radius: 7px;
+  border-radius: 6px;
 }
-
 .modal-content::-webkit-scrollbar-track {
   background: #eee;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.9); }
-  to { opacity: 1; transform: scale(1); }
+/* 自訂滾軸：Firefox */
+.modal-content {
+  scrollbar-width: auto;
+  scrollbar-color: #7e8a24 #eee;
 }
 
+#modalDetails {
+  position: relative;      /* scroll-hint 絕對定位的參考容器 */
+  max-height: 60vh;        /* 視需要調整 */
+  overflow-y: auto;        /* 產生捲動 */
+}
+  
+/* 捲動提示 */
+.scroll-hint {
+  position: absolute;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.4rem 0.8rem;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  border-radius: 0.25rem;
+  font-size: 0.85rem;
+  display: none;        /* 預設隱藏 */
+  pointer-events: none; /* 不攔截滑動或點擊 */
+  z-index: 10;          /* 浮在內容上方 */
+}
+.scroll-hint.show {
+  display: block;
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* 動畫定義 */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes fadeInScale {
+  from { opacity: 0; transform: scale(0.9); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* 關閉按鈕 */
 .close-modal {
   position: absolute;
   top: 10px;
   right: 15px;
+  width: 36px; height: 36px;
   font-size: 1.5rem;
-  width: 36px;
-  height: 36px;
   text-align: center;
   line-height: 36px;
   cursor: pointer;
-  color: white;
-  background-color: #e74c3c;  /* 背景紅色 */
+  color: #fff;
+  background-color: #e74c3c;
   border: none;
-  border-radius: 50%;         /* 圓形按鈕 */
+  border-radius: 50%;
   transition: background-color 0.3s ease, transform 0.2s ease;
 }
-
 .close-modal:hover {
-  background-color: #c0392b;  /* 滑過變深紅 */
-  transform: scale(1.1);      /* 稍微放大 */
+  background-color: #c0392b;
+  transform: scale(1.1);
 }
 
 /* 全螢幕 Icon Grid Modal */
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
   background: rgba(0, 0, 0, 0.6);
   display: none;
   align-items: center;
@@ -635,11 +665,10 @@ header nav a:hover {
   max-width: 500px;
   width: 90%;
   text-align: center;
-  animation: fadeIn 0.3s ease;
+  animation: fadeInScale 0.3s ease;
 }
 .icon-grid h2 {
-  margin-top: 0;
-  margin-bottom: 1rem;
+  margin: 0 0 1rem;
 }
 .grid-container {
   display: grid;
@@ -657,19 +686,16 @@ header nav a:hover {
   flex-direction: column;
   align-items: center;
 }
-/* 調整 icon 圖示大小 */
 .grid-item img {
-  width: auto;    /* 設定合適的寬度，例如 60px */
-  height: 30px;   /* 同時調整高度，或設定 auto 依比例調整 */
-  object-fit: contain; /* 若圖示比例不同，可使用此設定 */
+  width: auto;
+  height: 30px;
+  object-fit: contain;
   margin-bottom: 0.5rem;
 }
-/* 調整 icon 文字大小 */
 .grid-item span {
   font-size: 16px;
   font-weight: 600;
   margin-top: 8px;
-  display: block;
   text-align: center;
 }
 .grid-item:hover,
@@ -686,6 +712,7 @@ header nav a:hover {
   cursor: pointer;
   margin-top: 1rem;
 }
+
 
 
 /* ============================================================
@@ -896,6 +923,8 @@ header nav a:hover {
         <p id="modalDescription"></p>
         <p id="modalPrice"></p>
         <button id="modalSelectButton" class="btn-select" onclick="modalSelectProduct()">加入背籃</button>
+        <!-- 提示元素 -->
+      <div id="scrollHint" class="scroll-hint">向下滑動查看更多 ↓</div>
       </div>
     </div>
   </div>
@@ -1242,6 +1271,43 @@ header nav a:hover {
       });
     }
   }
+
+   /*******************************************
+   * 在這裡加入「滑動提示」的初始化與監聽
+   *******************************************/
+  (function() {
+    const modalDetails = document.getElementById('modalDetails');
+    const scrollHint   = document.getElementById('scrollHint');
+    const productModal = document.getElementById('productModal');
+
+    // 每次打開商品 Modal 時檢查是否需要顯示提示
+    const origOpen = openProductModal;
+    openProductModal = function(code, intro, price, stock, imageUrl) {
+      origOpen(code, intro, price, stock, imageUrl);
+      // 微延遲，等內容渲染完畢
+      setTimeout(() => {
+        if (modalDetails.scrollHeight > modalDetails.clientHeight) {
+          scrollHint.classList.add('show');
+        } else {
+          scrollHint.classList.remove('show');
+        }
+      }, 50);
+    };
+
+    // 監聽使用者在 Modal 內容的捲動
+    modalDetails.addEventListener('scroll', () => {
+      if (scrollHint.classList.contains('show')) {
+        scrollHint.classList.remove('show');
+      }
+    });
+
+    // 如果你有在點空白處關閉，也一併隱藏提示
+    window.addEventListener('click', (e) => {
+      if (e.target === productModal) {
+        scrollHint.classList.remove('show');
+      }
+    });
+  })();
 
   /*******************************************
    * 背籃與數量處理函式區
